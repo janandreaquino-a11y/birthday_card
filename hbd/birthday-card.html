@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <!-- Tailwind CSS for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Dancing+Script:wght@700&display=swap');
+
+        body {
+            /* Use a festive background gradient with cute colors */
+            background: linear-gradient(to right, #87ceeb, #e0f7fa); /* Light blue gradient */
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Hide overflow from animations */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            perspective: 1000px; /* Perspective for the 3D flip effect */
+        }
+
+        .card-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            position: relative;
+            width: 32rem; /* Adjusted for better appearance */
+            height: 40rem; /* Adjusted for better appearance */
+            transform-style: preserve-3d;
+            transition: transform 1.0s;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1.5rem; /* rounded-2xl in Tailwind */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            font-family: 'Dancing Script', cursive;
+            text-align: center;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #8a2be2; /* A soft purple */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #8a2be2; /* A soft purple */
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .from-text {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 1rem;
+        }
+
+        .flip-button {
+            background-color: #8a2be2;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            border-radius: 9999px; /* rounded-full in Tailwind */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 2rem;
+        }
+
+        .flip-button:hover {
+            background-color: #6a1ba3;
+            transform: scale(1.05);
+        }
+
+        /* Keyframes for the hearts animation */
+        @keyframes heart-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 1;
+            }
+        }
+
+        .heart {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 20px;
+            z-index: 5;
+            pointer-events: none; /* Allows clicks to go through to the card */
+            animation: heart-fall linear infinite;
+            display: none; /* Hide hearts by default */
+        }
+
+        /* Styling for the tulips on the edges */
+        @keyframes tulip-sway {
+            0% { transform: rotate(15deg); }
+            50% { transform: rotate(-15deg); }
+            100% { transform: rotate(15deg); }
+        }
+
+        .tulip-border {
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            display: none; /* Hide tulips by default */
+            flex-direction: column;
+            justify-content: space-around;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .tulip-border-left {
+            left: 10px;
+        }
+
+        .tulip-border-right {
+            right: 10px;
+        }
+
+        .tulip {
+            font-size: 3rem;
+            animation: tulip-sway 4s ease-in-out infinite;
+        }
+
+        /* Styling for the countdown timer and confetti */
+        #countdown-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 8rem;
+            font-weight: bold;
+            color: #8a2be2;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        #card-container {
+            display: none; /* Hide card by default */
+        }
+        
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 20px;
+            z-index: 5;
+            pointer-events: none;
+            animation: heart-fall linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- The audio element for the song -->
+    <!-- Add a URL to your MP3 file in the 'src' attribute.
+         This audio will play automatically and loop in the background. -->
+    <audio id="birthdaySong" src="" autoplay loop></audio>
+
+    <!-- Tulips on the left edge -->
+    <div class="tulip-border tulip-border-left">
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+    </div>
+
+    <!-- Tulips on the right edge -->
+    <div class="tulip-border tulip-border-right">
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+        <span class="tulip">🌷</span>
+    </div>
+
+    <!-- Main countdown container -->
+    <div id="countdown-container">
+        <span id="countdown-number">5</span>
+    </div>
+
+    <!-- Main birthday card container -->
+    <div id="card-container">
+        <div id="card" class="card">
+            <!-- Front of the card -->
+            <div class="card-face card-front">
+                <h1 class="text-6xl font-bold mb-4">Happy Birthday!</h1>
+                <p class="text-2xl mt-4">
+                As you turn another year older, I know that God will continue to bless you.Enjoy your special day, love. Happy Birthday!
+                </p>
+                <div class="from-text">
+                    <p>- From Your LabLab</p>
+                </div>
+                <button id="flipBtn" class="flip-button">Flip Me!</button>
+            </div>
+
+            <!-- Back of the card -->
+            <div class="card-face card-back p-8">
+                <h2 class="font-bold text-4xl mb-4">A Little Extra Message!</h2>
+                <p class="text-2xl mt-4">
+                    You're an amazing person and deserve all the happiness in the world.
+                    I hope this year brings you everything you've ever wished for!
+                </p>
+                <button id="unflipBtn" class="flip-button">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to handle the countdown, card flip, and hearts animation
+        const cardContainer = document.getElementById('card-container');
+        const countdownContainer = document.getElementById('countdown-container');
+        const countdownNumber = document.getElementById('countdown-number');
+        const tulipBorders = document.querySelectorAll('.tulip-border');
+        const card = document.getElementById('card');
+        const flipBtn = document.getElementById('flipBtn');
+        const unflipBtn = document.getElementById('unflipBtn');
+        const heartColors = ['#1e90ff', '#8a2be2', '#4169e1', '#b0e0e6', '#c0c0c0'];
+        const confettiEmojis = ['✨', '🎈', '🎉', '🎁'];
+        let confettiInterval;
+        
+        function createConfetti() {
+            const confetti = document.createElement('span');
+            confetti.classList.add('confetti');
+            confetti.innerHTML = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+
+            const left = Math.random() * window.innerWidth;
+            const size = Math.random() * 20 + 10;
+            const duration = Math.random() * 5 + 3;
+            const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+
+            confetti.style.left = `${left}px`;
+            confetti.style.fontSize = `${size}px`;
+            confetti.style.color = color;
+            confetti.style.animationDuration = `${duration}s`;
+            confetti.style.animationDelay = `-${Math.random() * 8}s`;
+            confetti.style.animationIterationCount = 'infinite';
+            confetti.style.display = 'block';
+
+            document.body.appendChild(confetti);
+
+            setTimeout(() => {
+                confetti.remove();
+            }, duration * 1000);
+        }
+        
+        function startConfettiAnimation() {
+            confettiInterval = setInterval(() => {
+                createConfetti();
+            }, 200);
+        }
+
+        function stopConfettiAnimation() {
+            clearInterval(confettiInterval);
+            document.querySelectorAll('.confetti').forEach(confetti => confetti.remove());
+        }
+
+        function startCountdown() {
+            let count = 5;
+            countdownNumber.textContent = count;
+            const timer = setInterval(() => {
+                count--;
+                countdownNumber.textContent = count;
+                if (count <= 0) {
+                    clearInterval(timer);
+                    countdownContainer.style.display = 'none';
+                    cardContainer.style.display = 'flex';
+                    tulipBorders.forEach(border => {
+                        border.style.display = 'flex';
+                    });
+                    stopConfettiAnimation();
+                    // Start the hearts animation immediately after the card appears
+                    generateHeartBurst();
+                    setInterval(() => {
+                        createHeart();
+                    }, 100);
+                    setInterval(generateHeartBurst, 5000);
+                }
+            }, 1000);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('span');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+
+            const left = Math.random() * window.innerWidth;
+            const size = Math.random() * 20 + 10;
+            const duration = Math.random() * 5 + 3;
+            const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+
+            heart.style.left = `${left}px`;
+            heart.style.fontSize = `${size}px`;
+            heart.style.color = color;
+            heart.style.animationDuration = `${duration}s`;
+            heart.style.animationDelay = `-${Math.random() * 8}s`;
+            heart.style.animationIterationCount = 'infinite';
+            heart.style.display = 'block';
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        function generateHeartBurst() {
+            for (let i = 0; i < 20; i++) {
+                createHeart();
+            }
+        }
+
+        // The flip button now only handles the card's rotation
+        flipBtn.addEventListener('click', () => {
+            card.classList.add('flipped');
+        });
+
+        unflipBtn.addEventListener('click', () => {
+            card.classList.remove('flipped');
+        });
+
+        window.onload = function() {
+            startConfettiAnimation();
+            startCountdown();
+        };
+    </script>
+
+</body>
+</html>
